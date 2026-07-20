@@ -3,61 +3,775 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EXE - Global Access Only</title>
+    <title>LUXE CC MARKET - Premium Cards</title>
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    
+    <!-- Flag Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@6.6.6/css/flag-icons.min.css">
+    
     <style>
-        body {
-            background-color: #0d0d12;
-            color: #00ffcc;
-            font-family: 'Courier New', monospace;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+        /* ===== LUXE PREMIUM STYLES ===== */
+        :root {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #141414;
+            --accent-primary: #d4af37; /* Premium Gold */
+            --accent-secondary: #b5952f;
+            --accent-tertiary: #f3e5ab;
+            --gradient-1: linear-gradient(135deg, #d4af37, #8a7322);
+            --gradient-2: linear-gradient(135deg, #1c1c1c, #0a0a0a);
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0a0;
+            --card-bg: rgba(20, 20, 20, 0.85);
+            --border-color: rgba(212, 175, 55, 0.2);
+        }
+
+        * {
             margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
         }
-        .box {
-            border: 2px solid #00ffcc;
+
+        body {
+            background: var(--bg-primary);
+            min-height: 100vh;
+            color: #fff;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.1), transparent 70%);
+            opacity: 0.8;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Auth Container */
+        .auth-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .auth-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        .glass-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
             padding: 40px;
-            border-radius: 12px;
-            text-align: center;
-            box-shadow: 0 0 20px rgba(0, 255, 204, 0.3);
-            background-color: #15151e;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
         }
-        h1 {
-            margin: 0 0 10px 0;
-            font-size: 2.5em;
+
+        .brand-panel { display: flex; flex-direction: column; justify-content: center; }
+
+        .brand-logo {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             letter-spacing: 2px;
         }
-        .tag {
-            color: #ff0055;
-            font-weight: bold;
-            font-size: 1.2em;
-            margin-bottom: 20px;
-            letter-spacing: 1px;
+
+        .brand-tagline {
+            font-size: 1.2rem;
+            margin-bottom: 40px;
+            color: var(--accent-primary);
+            letter-spacing: 4px;
+            text-transform: uppercase;
         }
-        p {
-            font-size: 1.1em;
-            color: #cccccc;
+
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 40px; }
+        .stat-item { text-align: center; }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+            color: var(--accent-primary);
         }
-        .status {
-            margin-top: 25px;
-            padding: 10px;
-            background: rgba(0, 255, 0, 0.1);
-            border: 1px dashed #00ff00;
-            color: #00ff00;
-            font-weight: bold;
+
+        .stat-label { font-size: 0.9rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; }
+        
+        .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin: 40px 0; }
+        .feature-item { text-align: center; padding: 20px; background: rgba(212, 175, 55, 0.05); border-radius: 10px; border: 1px solid rgba(212,175,55,0.1); }
+        .feature-icon { font-size: 2rem; margin-bottom: 10px; color: var(--accent-primary); }
+        .feature-title { font-weight: 600; margin-bottom: 5px; color: #fff; }
+        .feature-desc { font-size: 0.8rem; color: var(--text-secondary); }
+
+        .security-badge {
+            display: flex; align-items: center; justify-content: center; gap: 20px;
+            margin-top: 30px; padding-top: 20px; border-top: 1px solid var(--border-color);
         }
+        .badge-item { display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: var(--text-secondary); }
+        .badge-icon { width: 20px; height: 20px; background: rgba(212, 175, 55, 0.2); color: var(--accent-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+
+        .login-panel { color: white; }
+        .login-header { text-align: center; margin-bottom: 30px; }
+        .login-title { font-size: 2rem; font-weight: 700; margin-bottom: 10px; color: var(--accent-primary); }
+        .login-subtitle { color: var(--text-secondary); }
+
+        .tab-buttons { display: flex; gap: 10px; margin-bottom: 30px; }
+        .tab-btn {
+            flex: 1; padding: 12px; background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color); border-radius: 10px; color: white;
+            font-weight: 600; cursor: pointer; transition: all 0.3s;
+        }
+        .tab-btn.active { background: var(--gradient-1); border-color: transparent; color: #000; }
+        
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; color: var(--text-secondary); font-size: 0.9rem; }
+        .form-group input {
+            width: 100%; padding: 15px; background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--border-color); border-radius: 10px; color: white; transition: all 0.3s;
+        }
+        .form-group input:focus { outline: none; border-color: var(--accent-primary); box-shadow: 0 0 10px rgba(212, 175, 55, 0.2); }
+
+        .form-options { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-size: 0.9rem; }
+        .remember-me { display: flex; align-items: center; gap: 8px; color: var(--text-secondary); }
+        .forgot-password { color: var(--accent-primary); text-decoration: none; }
+
+        .sign-in-btn {
+            width: 100%; padding: 15px; background: var(--gradient-1);
+            border: none; border-radius: 10px; color: #000; font-size: 1.1rem;
+            font-weight: 700; cursor: pointer; transition: all 0.3s; text-transform: uppercase; letter-spacing: 1px;
+        }
+        .sign-in-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(212, 175, 55, 0.3); }
+
+        .create-account { text-align: center; margin: 20px 0; color: var(--text-secondary); }
+        .create-account a { color: var(--accent-primary); font-weight: 600; text-decoration: none; }
+
+        .error-message, .success-message { padding: 12px; border-radius: 8px; margin-bottom: 20px; display: none; text-align: center; font-weight: 600; }
+        .error-message { background: rgba(255, 68, 68, 0.1); border: 1px solid #ff4444; color: #ff4444; }
+        .success-message { background: rgba(212, 175, 55, 0.1); border: 1px solid var(--accent-primary); color: var(--accent-primary); }
+
+        /* Navigation */
+        .navbar {
+            background: rgba(10, 10, 10, 0.95); backdrop-filter: blur(10px);
+            padding: 15px 30px; display: flex; justify-content: space-between;
+            align-items: center; border-bottom: 1px solid var(--border-color);
+            position: sticky; top: 0; z-index: 100;
+        }
+        .logo-link { font-size: 1.8rem; font-weight: 800; color: var(--accent-primary); text-decoration: none; letter-spacing: 2px; }
+        .nav-links { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
+        .nav-link { color: var(--text-secondary); cursor: pointer; padding: 8px 15px; border-radius: 5px; font-weight: 500; transition: 0.3s; }
+        .nav-link:hover { color: var(--accent-primary); background: rgba(212, 175, 55, 0.1); }
+        
+        .balance { background: rgba(212, 175, 55, 0.1); padding: 8px 20px; border-radius: 20px; border: 1px solid var(--accent-primary); }
+        .balance span { color: var(--accent-primary); font-weight: bold; }
+        .logout-btn { background: transparent; color: #ff4444; border: 1px solid #ff4444; padding: 8px 20px; border-radius: 5px; cursor: pointer; font-weight: 600; transition: 0.3s; }
+        .logout-btn:hover { background: #ff4444; color: #fff; }
+
+        .container { max-width: 1400px; margin: 30px auto; padding: 0 30px; z-index: 2; position: relative; }
+
+        .warning-bar {
+            background: rgba(255, 68, 68, 0.1); padding: 15px 20px; margin-bottom: 20px;
+            display: flex; justify-content: space-between; align-items: center;
+            border-radius: 10px; border: 1px solid #ff4444; display: none;
+        }
+        .warning-text { color: #ff4444; font-weight: 500; }
+        .days-left { background: #ff4444; color: white; padding: 5px 15px; border-radius: 5px; font-weight: bold; }
+        .topup-now { background: var(--gradient-1); color: #000; padding: 8px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+
+        /* Filters */
+        .filters { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
+        .filter-select, .filter-input {
+            padding: 12px 15px; background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--border-color); color: #fff;
+            border-radius: 10px; min-width: 200px; font-size: 0.95rem;
+        }
+        .filter-select option { background: var(--bg-primary); color: #fff; }
+
+        /* Tables */
+        .table-container { overflow-x: auto; border-radius: 15px; border: 1px solid var(--border-color); background: var(--card-bg); }
+        .deals-table { width: 100%; border-collapse: collapse; min-width: 1200px; }
+        .deals-table thead { background: rgba(212, 175, 55, 0.1); }
+        .deals-table th { padding: 18px 15px; text-align: left; color: var(--accent-primary); font-weight: 600; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 1px; }
+        .deals-table td { padding: 18px 15px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); font-size: 0.95rem; }
+        .deals-table tr:hover { background: rgba(212, 175, 55, 0.05); }
+        
+        .price { color: var(--accent-primary); font-weight: bold; font-size: 1.1rem; }
+        .card-balance { font-weight: bold; text-align: right; padding-right: 15px; }
+        .card-balance.high { color: #4ade80; }
+        .card-balance.medium { color: var(--accent-primary); }
+        .card-balance.low { color: #f87171; }
+        
+        .badge { display: inline-block; padding: 5px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+        .badge-visa { background: rgba(26, 77, 140, 0.2); color: #60a5fa; border: 1px solid #1a4d8c; }
+        .badge-mastercard { background: rgba(235, 0, 27, 0.2); color: #ff8f9c; border: 1px solid #eb001b; }
+        .badge-amex { background: rgba(0, 111, 207, 0.2); color: #7dd3fc; border: 1px solid #006fcf; }
+        .badge-others { background: rgba(108, 117, 125, 0.2); color: #d1d5db; border: 1px solid #6c757d; }
+
+        .buy-btn {
+            background: var(--gradient-1); color: #000; border: none;
+            padding: 8px 16px; border-radius: 6px; font-weight: 700; cursor: pointer; transition: 0.3s; text-transform: uppercase; font-size: 0.85rem;
+        }
+        .buy-btn:hover { box-shadow: 0 0 15px rgba(212, 175, 55, 0.4); transform: scale(1.05); }
+        .insufficient { color: #ff4444; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; }
+
+        /* Deposit Page */
+        .deposit-container { max-width: 800px; margin: 0 auto; }
+        .payment-tabs { display: flex; gap: 15px; margin: 25px 0; }
+        .payment-tab {
+            flex: 1; padding: 15px; background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color); border-radius: 10px; color: white;
+            font-size: 1rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.3s;
+        }
+        .payment-tab.active { background: var(--gradient-1); color: #000; border-color: transparent; }
+        
+        .crypto-tab { flex: 1; padding: 12px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color); color: #fff; border-radius: 8px; cursor: pointer; font-weight: 600; transition: 0.3s; }
+        .crypto-tab.active { background: var(--accent-primary); color: #000; border: none; }
+
+        .proceed-btn {
+            width: 100%; padding: 18px; background: var(--gradient-1);
+            border: none; border-radius: 10px; color: #000; font-size: 1.1rem;
+            font-weight: 700; cursor: pointer; transition: all 0.3s; text-transform: uppercase; letter-spacing: 1px;
+        }
+        .proceed-btn:hover { box-shadow: 0 5px 20px rgba(212, 175, 55, 0.3); }
+
+        .address-box { background: rgba(0, 0, 0, 0.5); padding: 15px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; margin: 15px 0; border: 1px solid var(--border-color); }
+        .copy-btn { background: var(--accent-primary); color: #000; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: 700; }
+
+        /* Landing Page Elements */
+        .landing-page { background: var(--bg-primary); }
+        .landing-navbar { background: rgba(10, 10, 10, 0.95); border-bottom: 1px solid var(--border-color); padding: 15px 5%; }
+        .landing-logo { font-size: 1.6rem; font-weight: 800; color: #fff; letter-spacing: 1px; }
+        .landing-logo span { color: var(--accent-primary); }
+        .hero { background: var(--gradient-2); min-height: 90vh; }
+        .hero h1 { background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .badge { background: rgba(212, 175, 55, 0.1); color: var(--accent-primary); border: 1px solid var(--accent-primary); }
+        .explore-btn { background: var(--gradient-1); color: #000; }
+        .explore-btn:hover { box-shadow: 0 8px 30px rgba(212, 175, 55, 0.4); }
+        .card-showcase { background: var(--card-bg); border: 1px solid var(--border-color); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6); }
+        .card-price-row { border-top: 1px solid rgba(212, 175, 55, 0.3); }
+        .price { color: var(--accent-primary); text-shadow: none; }
+        
+        .why-choose { background: var(--bg-secondary); }
+        .why-choose h2 { background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .feature-card { background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); }
+        .feature-card:hover { border-color: var(--accent-primary); box-shadow: 0 10px 30px rgba(212, 175, 55, 0.1); }
+        .feature-card i { background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        .faq { background: var(--bg-primary); }
+        .faq h2 { background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .faq-item { background: rgba(212, 175, 55, 0.03); border: 1px solid var(--border-color); }
+        .faq-item:hover { border-color: var(--accent-primary); }
+        
+        .cta { background: var(--bg-secondary); border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); }
+        .cta h2 { background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .browse-btn { background: var(--gradient-1); color: #000; }
+        
+        .footer { background: var(--bg-primary); border-top: 1px solid var(--border-color); }
+        .landing-login-btn { background: var(--gradient-1); color: #000; }
+        
+        /* Modals & Support */
+        .support-button { background: var(--gradient-1); box-shadow: 0 4px 20px rgba(212, 175, 55, 0.3); border: 2px solid #000; }
+        .support-button i { color: #000; }
+        .support-modal { background: rgba(15, 15, 15, 0.98); border: 1px solid var(--accent-primary); box-shadow: 0 10px 40px rgba(0,0,0,0.8); }
+        .support-header h3 { color: var(--accent-primary); }
+        .support-contact { background: rgba(255,255,255,0.02); border: 1px solid rgba(212, 175, 55, 0.2); }
+        .support-contact:hover { border-color: var(--accent-primary); }
+        .support-contact i { color: var(--accent-primary); }
+
+        ::-webkit-scrollbar { height: 8px; width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-primary); }
+        ::-webkit-scrollbar-thumb { background: rgba(212, 175, 55, 0.3); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent-primary); }
+
+        /* History Cards */
+        .history-card {
+            background: rgba(255,255,255,0.03); border: 1px solid var(--border-color);
+            padding: 15px 20px; border-radius: 12px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;
+        }
+        .view-details { background: rgba(212, 175, 55, 0.1); color: var(--accent-primary); border: 1px solid var(--accent-primary); padding: 5px 15px; border-radius: 5px; cursor: pointer; transition: 0.3s; }
+        .view-details:hover { background: var(--accent-primary); color: #000; }
+        .status.completed { color: #4ade80; }
+        .status.pending { color: var(--accent-primary); }
+
+        /* Modal Overlay */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: none; justify-content: center; align-items: center; z-index: 2000; }
+        .modal-box { background: var(--bg-secondary); padding: 30px; border-radius: 15px; max-width: 400px; width: 90%; border: 1px solid var(--accent-primary); }
+        .close-modal { width: 100%; padding: 12px; background: rgba(212, 175, 55, 0.1); color: var(--accent-primary); border: 1px solid var(--accent-primary); border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 15px; transition: 0.3s; }
+        .close-modal:hover { background: var(--accent-primary); color: #000; }
+
     </style>
 </head>
 <body>
 
-    <div class="box">
-        <h1>EXE WEB SYSTEM</h1>
-        <div class="tag">USE ON TOP</div>
-        <p>Welcome! Connection Secured.</p>
-        <p>If you are reading this, you are successfully connected from outside India.</p>
-        <div class="status">● NETWORK: ONLINE (VPN/GLOBAL)</div>
-    </div>
+<!-- LANDING PAGE -->
+<div id="landingPage" class="landing-page">
+    <nav class="landing-navbar">
+        <div class="landing-logo">LUXE <span>CC MARKET</span></div>
+        <div class="landing-nav-links">
+            <a href="#features">Features</a>
+            <a href="#gateway">Gateway</a>
+            <a href="#cards">Cards</a>
+            <a href="#faq">FAQ</a>
+        </div>
+        <div class="landing-nav-right">
+            <button class="landing-login-btn" onclick="showAuthPage()">Login</button>
+            <i class="fas fa-bars" style="color:#d4af37;"></i>
+        </div>
+    </nav>
 
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="badge-container">
+                <span class="badge" style="background:transparent;"><i class="fas fa-gem" style="margin-right:5px;"></i> Premium Access</span>
+                <span class="badge" style="background:transparent;"><i class="fas fa-bolt" style="margin-right:5px;"></i> Instant Delivery</span>
+            </div>
+            <h1 style="font-size: clamp(2.5rem, 6vw, 4rem); font-weight: 800; line-height: 1.1; margin-bottom: 1.5rem;">LUXE<br>CC MARKET</h1>
+            <p>Experience the most exclusive card delivery network with seamless crypto and UPI payments. Luxury meets reliability.</p>
+            <button class="explore-btn" onclick="showAuthPage()">Access Market →</button>
+            
+            <div style="display:flex; gap:1.5rem; margin-top:2rem; color:var(--text-secondary); font-size:0.9rem;">
+                <span><i class="fas fa-shield-alt" style="color:var(--accent-primary);"></i> Encrypted</span>
+                <span><i class="fas fa-gem" style="color:var(--accent-primary);"></i> High Balance</span>
+                <span><i class="fas fa-globe" style="color:var(--accent-primary);"></i> Global</span>
+            </div>
+        </div>
+
+        <div class="hero-image">
+            <div class="card-showcase">
+                <div class="card-chip" style="background:linear-gradient(135deg, #e6c27a, #a67c00);"></div>
+                <div class="card-number" style="letter-spacing: 4px; color:#fff;">•••• •••• •••• 8888</div>
+                <div class="card-details">
+                    <div class="card-holder">
+                        PLATINUM MEMBER
+                        <span style="color:#d4af37;">Exclusive Access</span>
+                    </div>
+                    <i class="fab fa-cc-mastercard" style="font-size: 2.5rem; color: #d4af37;"></i>
+                </div>
+                <div class="card-price-row">
+                    <span class="price">PREMIUM</span>
+                    <span class="currency">Verified</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Why Choose Us -->
+    <section id="features" class="why-choose" style="padding: 5rem 5%; text-align: center;">
+        <h2>The Luxe Standard</h2>
+        <p style="color:var(--text-secondary); margin-bottom:3rem;">Why professionals choose our marketplace</p>
+        
+        <div class="features-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem; max-width: 1200px; margin: 0 auto; text-align:left;">
+            <div class="feature-card" style="padding:2rem; border-radius:15px;">
+                <i class="fas fa-tachometer-alt" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                <h3 style="color:#fff; margin-bottom:0.5rem;">Instant Fulfillment</h3>
+                <p style="color:var(--text-secondary); font-size:0.9rem;">Assets are transferred to your dashboard immediately upon payment confirmation.</p>
+            </div>
+            <div class="feature-card" style="padding:2rem; border-radius:15px;">
+                <i class="fas fa-lock" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                <h3 style="color:#fff; margin-bottom:0.5rem;">Military-Grade Security</h3>
+                <p style="color:var(--text-secondary); font-size:0.9rem;">Your data and transactions are protected by advanced AES-256 encryption.</p>
+            </div>
+            <div class="feature-card" style="padding:2rem; border-radius:15px;">
+                <i class="fas fa-gem" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                <h3 style="color:#fff; margin-bottom:0.5rem;">Premium Quality</h3>
+                <p style="color:var(--text-secondary); font-size:0.9rem;">We ensure the highest validity rates in the industry. Quality over quantity.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer" style="padding: 4rem 5% 2rem;">
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:2rem; max-width:1200px; margin:0 auto;">
+            <div>
+                <div class="landing-logo" style="margin-bottom:1rem;">LUXE <span>MARKET</span></div>
+                <p style="color:var(--text-secondary); font-size:0.9rem;">The most exclusive premium card marketplace.</p>
+            </div>
+            <div>
+                <h4 style="color:#fff; margin-bottom:1rem;">Support</h4>
+                <ul style="list-style:none; line-height:2;">
+                    <li><a href="#" style="color:var(--text-secondary); text-decoration:none;">Help Center</a></li>
+                    <li><a href="#" style="color:var(--text-secondary); text-decoration:none;">Terms of Service</a></li>
+                </ul>
+            </div>
+        </div>
+        <div style="text-align:center; color:var(--text-secondary); font-size:0.8rem; margin-top:3rem; padding-top:2rem; border-top:1px solid var(--border-color);">
+            © 2026 LUXE CC MARKET. All rights reserved.
+        </div>
+    </footer>
+</div>
+
+<!-- AUTH PAGE -->
+<div id="authPage" class="auth-page" style="display:none;">
+    <div class="auth-container">
+        <div class="auth-grid">
+            <div class="brand-panel glass-card">
+                <div class="brand-logo" id="siteTitle">LUXE</div>
+                <div class="brand-tagline" id="siteSubtitle">CC MARKET</div>
+                
+                <div class="security-badge">
+                    <div class="badge-item"><span class="badge-icon">✓</span>256-bit encryption</div>
+                    <div class="badge-item"><span class="badge-icon">✓</span>Private Network</div>
+                </div>
+            </div>
+            
+            <div class="login-panel glass-card">
+                <div class="login-header">
+                    <div class="login-title">Client Portal</div>
+                    <div class="login-subtitle">Authenticate to access the market</div>
+                </div>
+                
+                <div class="tab-buttons">
+                    <button class="tab-btn active" id="loginTab" onclick="switchTab('login')">Sign In</button>
+                    <button class="tab-btn" id="registerTab" onclick="switchTab('register')">Register</button>
+                </div>
+                
+                <div id="errorMessage" class="error-message"></div>
+                <div id="successMessage" class="success-message"></div>
+                
+                <form id="loginForm" onsubmit="handleLogin(event)">
+                    <div class="form-group"><label>Email Address</label><input type="email" id="loginEmail" required></div>
+                    <div class="form-group"><label>Master Password</label><input type="password" id="loginPassword" required></div>
+                    <div class="form-options">
+                        <label class="remember-me"><input type="checkbox" id="rememberMe"> Keep me connected</label>
+                    </div>
+                    <button type="submit" class="sign-in-btn">Authenticate</button>
+                </form>
+                
+                <form id="registerForm" style="display:none;" onsubmit="handleRegister(event)">
+                    <div class="form-group"><label>Alias / Name</label><input type="text" id="registerName"></div>
+                    <div class="form-group"><label>Secure Email</label><input type="email" id="registerEmail" required></div>
+                    <div class="form-group"><label>Password</label><input type="password" id="registerPassword" required></div>
+                    <div class="form-group"><label>Confirm Password</label><input type="password" id="registerConfirmPassword" required></div>
+                    <button type="submit" class="sign-in-btn">Create Account</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MAIN WEBSITE -->
+<div id="mainWebsite" class="main-website" style="display:none;">
+    <nav class="navbar">
+        <a href="#" class="logo-link" id="navTitle">LUXE MARKET</a>
+        <div class="nav-links" id="navLinks"></div>
+    </nav>
+
+    <div class="container">
+        <!-- Warning Bar -->
+        <div id="warningBar" class="warning-bar">
+            <div class="warning-text">
+                <span id="warningEn">⚠️ Account pending deletion due to inactivity in</span>
+            </div>
+            <div class="days-left" id="daysLeft">7 days</div>
+            <span class="topup-now" onclick="showPage('topup')">Add Funds →</span>
+        </div>
+
+        <!-- Deals Page -->
+        <div id="dealsPage">
+            <div class="filters">
+                <select class="filter-select" id="typeFilter" onchange="applyFilters()"></select>
+                <select class="filter-select" id="countryFilter" onchange="applyFilters()"></select>
+                <div style="position:relative; flex:2;">
+                    <input type="text" class="filter-input" id="searchInput" placeholder="Search bin, bank, country..." onkeyup="applyFilters()" style="width:100%;">
+                    <i class="fas fa-search" style="position:absolute; right:15px; top:50%; transform:translateY(-50%); color:var(--accent-primary);"></i>
+                </div>
+            </div>
+            <div class="active-filters" id="activeFilters"></div>
+            
+            <div class="table-container">
+                <table class="deals-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Type</th>
+                            <th>BIN</th>
+                            <th>Details</th>
+                            <th>Country</th>
+                            <th>Bank</th>
+                            <th>Zip</th>
+                            <th>Price</th>
+                            <th style="text-align:right;">Balance</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dealsBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- History Page -->
+        <div id="historyPage" style="display:none;">
+            <h2 style="color:var(--accent-primary); margin-bottom:20px;">Asset Portfolio</h2>
+            <div id="historyList"></div>
+            
+            <h2 style="color:var(--accent-primary); margin-top:40px; margin-bottom:20px;">Ledger (Payments)</h2>
+            <div id="paymentHistoryList"></div>
+        </div>
+
+        <!-- Deposit Page -->
+        <div id="topupPage" style="display:none;">
+            <div class="deposit-container">
+                <div class="glass-card" style="margin-bottom:20px;">
+                    <h1 style="color:var(--accent-primary); font-size:2rem; margin-bottom:10px;">Capital Deposit</h1>
+                    <p style="color:var(--text-secondary);">Fund your Luxe Market account</p>
+                </div>
+                
+                <div class="glass-card" style="margin-bottom:20px; padding:30px;">
+                    <div style="margin-bottom:20px;">
+                        <label style="display:block; margin-bottom:10px; font-weight:600; color:var(--text-secondary);">Deposit Amount (INR) - Min ₹<span id="minDepositDisplay">2000</span></label>
+                        <div style="display:flex; gap:10px; align-items:center;">
+                            <input type="number" id="inrAmount" min="2000" value="2000" style="flex:1; padding:15px; background:rgba(0,0,0,0.5); border:1px solid var(--border-color); border-radius:10px; color:#fff; font-size:1.1rem;" oninput="calculateUSD()">
+                            <span style="font-size:1.2rem; color:var(--accent-primary);">₹</span>
+                        </div>
+                    </div>
+                    <div style="background:rgba(212, 175, 55, 0.05); padding:20px; border-radius:10px; border:1px solid rgba(212, 175, 55, 0.2);">
+                        <p style="color:var(--text-secondary); margin-bottom:5px;">Market Exchange Rate: ₹<span id="exchangeRateDisplay">89</span> = $1 USD</p>
+                        <p style="font-size:2.5rem; font-weight:700; color:var(--accent-primary);" id="usdAmount">$0.00 USD</p>
+                    </div>
+                </div>
+                
+                <div class="payment-tabs">
+                    <button class="payment-tab active" onclick="selectPaymentMethod('upi')" id="upiTab"><i class="fas fa-qrcode"></i> UPI</button>
+                    <button class="payment-tab" onclick="selectPaymentMethod('crypto')" id="cryptoTab"><i class="fab fa-bitcoin"></i> Crypto</button>
+                </div>
+                
+                <button class="proceed-btn" id="proceedBtn" onclick="proceedToPayment()">Initialize Transfer</button>
+
+                <!-- Payment details sections -->
+                <div id="upiPaymentDetails" class="glass-card" style="display:none; padding:30px; margin-top:20px;">
+                    <h3 style="color:var(--accent-primary); margin-bottom:20px; text-align:center;">Scan to Pay</h3>
+                    <div style="text-align:center; margin-bottom:20px;" id="upiQRContainer"></div>
+                    <div class="address-box">
+                        <span id="upiAddressDisplay" style="color:var(--accent-primary);">admin@upi</span>
+                        <button class="copy-btn" onclick="copyAddress('upi')">Copy</button>
+                    </div>
+                    <button class="proceed-btn" onclick="showPaymentForm()" style="margin-top:20px;">Confirm Payment</button>
+                </div>
+
+                <div id="cryptoPaymentDetails" class="glass-card" style="display:none; padding:30px; margin-top:20px;">
+                    <div style="display:flex; gap:10px; margin-bottom:20px;">
+                        <button class="crypto-tab active" onclick="switchCrypto('usdt')" id="usdtTab">USDT (TRC-20)</button>
+                        <button class="crypto-tab" onclick="switchCrypto('btc')" id="btcTab">Bitcoin</button>
+                    </div>
+                    <div id="usdtSection">
+                        <div style="text-align:center; margin-bottom:20px;" id="usdtQRContainer"></div>
+                        <div class="address-box">
+                            <span id="usdtAddressDisplay" style="color:var(--accent-primary); font-size:0.9rem;">address_here</span>
+                            <button class="copy-btn" onclick="copyAddress('usdt')">Copy</button>
+                        </div>
+                    </div>
+                    <div id="btcSection" style="display:none;">
+                        <div style="text-align:center; margin-bottom:20px;" id="btcQRContainer"></div>
+                        <div class="address-box">
+                            <span id="btcAddressDisplay" style="color:var(--accent-primary); font-size:0.9rem;">address_here</span>
+                            <button class="copy-btn" onclick="copyAddress('btc')">Copy</button>
+                        </div>
+                    </div>
+                    <button class="proceed-btn" onclick="showPaymentForm()" style="margin-top:20px;">Confirm Payment</button>
+                </div>
+
+                <!-- Payment Form -->
+                <div id="paymentDetailsForm" class="glass-card" style="display:none; padding:30px; margin-top:20px;">
+                    <h3 style="color:var(--accent-primary); margin-bottom:20px;">Submit Transaction Proof</h3>
+                    <div class="form-group">
+                        <label>Transaction ID / Hash (Required)</label>
+                        <input type="text" id="txnId" placeholder="Enter TXID..." required>
+                    </div>
+                    <div style="display:flex; gap:15px; margin-top:20px;">
+                        <button onclick="cancelPaymentForm()" style="flex:1; background:transparent; border:1px solid #ff4444; color:#ff4444; padding:15px; border-radius:10px; cursor:pointer;">Cancel</button>
+                        <button onclick="submitPaymentProof()" class="proceed-btn" style="flex:1;">Submit Verification</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal & Support -->
+<div class="modal-overlay" id="cardModal">
+    <div class="modal-box">
+        <h3 style="color:var(--accent-primary); margin-bottom:15px;">Asset Details</h3>
+        <div id="cardDetailsContent" style="background:rgba(0,0,0,0.5); padding:15px; border-radius:8px; border:1px solid rgba(212,175,55,0.2); white-space:pre-wrap; font-family:monospace; color:#fff;"></div>
+        <button class="close-modal" onclick="closeCardModal()">Close</button>
+    </div>
+</div>
+
+<div class="support-widget">
+    <div class="support-button" onclick="toggleSupportModal()"><i class="fas fa-gem"></i></div>
+    <div class="support-modal" id="supportModal">
+        <div class="support-header" style="padding:20px; border-bottom:1px solid var(--border-color); display:flex; justify-content:space-between;">
+            <h3>Luxe Concierge</h3>
+            <i class="fas fa-times" onclick="toggleSupportModal()" style="color:var(--text-secondary); cursor:pointer;"></i>
+        </div>
+        <div style="padding:20px;">
+            <div class="support-contact" style="padding:15px; border-radius:10px; margin-bottom:10px;">
+                <i class="fas fa-envelope" style="margin-right:10px;"></i>
+                <span id="supportEmail">support@luxecc.market</span>
+            </div>
+            <div class="support-contact" style="padding:15px; border-radius:10px;">
+                <i class="fab fa-telegram" style="margin-right:10px;"></i>
+                <span>@LuxeAdmin</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script>
+// NEW FIREBASE CONFIGURATION
+const firebaseConfig = {
+  apiKey: "AIzaSyDkSUfUCAFdkBxxPd2D_KOVqtTyUyfC6BA",
+  authDomain: "luxemarket-a861a.firebaseapp.com",
+  databaseURL: "https://luxemarket-a861a-default-rtdb.firebaseio.com",
+  projectId: "luxemarket-a861a",
+  storageBucket: "luxemarket-a861a.firebasestorage.app",
+  messagingSenderId: "623481781780",
+  appId: "1:623481781780:web:1a64a0b287e5053ba53101",
+  measurementId: "G-J51M9V1J3H"
+};
+firebase.initializeApp(firebaseConfig); 
+const db = firebase.database(); 
+
+// References
+const usersRef = db.ref('users'); const dealsRef = db.ref('deals'); const pendingRef = db.ref('pendingPayments'); const approvedRef = db.ref('approvedPayments'); const activityRef = db.ref('activityLog'); const settingsRef = db.ref('settings'); const blacklistRef = db.ref('blacklist'); const navRef = db.ref('navSettings');
+
+let currentUser = null; let currentKey = null; let siteSettings = {}; 
+let navSettings = { navItems: [] }; let allDeals = []; let currentPayment = null; let selectedMethod = 'upi';
+
+// UI Logic
+function toggleSupportModal() { document.getElementById('supportModal').classList.toggle('show'); }
+function showAuthPage() { document.getElementById('landingPage').style.display = 'none'; document.getElementById('authPage').style.display = 'block'; document.getElementById('mainWebsite').style.display = 'none'; }
+function showMainWebsite() { document.getElementById('landingPage').style.display = 'none'; document.getElementById('authPage').style.display = 'none'; document.getElementById('mainWebsite').style.display = 'block'; }
+function showPage(page) { 
+    document.getElementById('dealsPage').style.display = page === 'deals' ? 'block' : 'none'; 
+    document.getElementById('historyPage').style.display = page === 'history' ? 'block' : 'none'; 
+    document.getElementById('topupPage').style.display = page === 'topup' ? 'block' : 'none'; 
+    if (page === 'deals') applyFilters(); if (page === 'history') loadHistory(); if (page === 'topup') calculateUSD(); 
+}
+function switchTab(tab) { 
+    document.getElementById('loginTab').classList.toggle('active', tab === 'login'); 
+    document.getElementById('registerTab').classList.toggle('active', tab === 'register'); 
+    document.getElementById('loginForm').style.display = tab === 'login' ? 'block' : 'none'; 
+    document.getElementById('registerForm').style.display = tab === 'register' ? 'block' : 'none'; 
+}
+
+function getFlag(c) { const m={'USA':'us','UK':'gb','INDIA':'in'}; return m[c?.toUpperCase()]||'xx'; }
+function getTypeBadge(t) { t=t?.toUpperCase()||''; if(t.includes('VISA'))return 'badge-visa'; if(t.includes('MASTER'))return 'badge-mastercard'; if(t.includes('AMEX'))return 'badge-amex'; return 'badge-others'; }
+
+function loadInitial() { 
+    settingsRef.once('value', s => { 
+        siteSettings = s.val() || { title:'LUXE', subtitle:'MARKET', exchangeRate: 89, minDeposit: 2000 }; 
+        document.getElementById('siteTitle').textContent = siteSettings.title || 'LUXE';
+        document.getElementById('siteSubtitle').textContent = siteSettings.subtitle || 'MARKET';
+        document.getElementById('exchangeRateDisplay').textContent = siteSettings.exchangeRate || 89;
+        document.getElementById('minDepositDisplay').textContent = siteSettings.minDeposit || 2000;
+    });
+    navRef.once('value', s => { 
+        navSettings = s.val() || { navItems: [{id:'deals',name:'Market',visible:true,order:1,type:'page',target:'deals'},{id:'history',name:'Portfolio',visible:true,order:2,type:'page',target:'history'},{id:'topup',name:'Deposit',visible:true,order:3,type:'page',target:'topup'}] }; 
+        updateNav(); 
+    });
+    dealsRef.on('value', s => { allDeals = s.val() ? Object.values(s.val()) : []; if (currentUser && document.getElementById('dealsPage').style.display !== 'none') applyFilters(); }); 
+    settingsRef.on('value', s => { 
+        const d = s.val() || {}; 
+        if(document.getElementById('upiAddressDisplay')) document.getElementById('upiAddressDisplay').textContent = d.upiAddress || 'admin@upi';
+        if(document.getElementById('upiQRContainer')) document.getElementById('upiQRContainer').innerHTML = d.upiQRHtml || '';
+    }); 
+}
+
+function updateNav() { 
+    const nav = document.getElementById('navLinks'); nav.innerHTML = ''; 
+    navSettings.navItems.sort((a,b)=>a.order-b.order).forEach(i => { 
+        if (i.visible) { const l = document.createElement('a'); l.className = 'nav-link'; l.textContent = i.name; if (i.type === 'page') l.onclick = ()=>showPage(i.target); else { l.href=i.target; l.target='_blank'; } nav.appendChild(l); } 
+    }); 
+    const bal = document.createElement('div'); bal.className = 'balance'; bal.innerHTML = 'Capital: <span id="userBalance">$0</span>'; nav.appendChild(bal); 
+    const lout = document.createElement('button'); lout.className = 'logout-btn'; lout.textContent = 'Disconnect'; lout.onclick = logout; nav.appendChild(lout); 
+}
+
+window.onload = () => { 
+    loadInitial(); const saved = localStorage.getItem('currentUser'); 
+    if (saved) { currentUser = JSON.parse(saved); currentKey = localStorage.getItem('currentKey'); showMainWebsite(); startListeners(); refreshUI(); showPage('deals'); } 
+    else { document.getElementById('landingPage').style.display = 'block'; } 
+};
+
+function startListeners() { 
+    if (currentKey) { usersRef.child(currentKey).on('value', s => { if (s.val()) { currentUser = s.val(); document.getElementById('userBalance').textContent = '$' + (currentUser.balance || 0); } }); } 
+}
+function refreshUI() { document.getElementById('userBalance').textContent = '$' + (currentUser.balance || 0); }
+
+function showError(msg) { const e = document.getElementById('errorMessage'); e.textContent = msg; e.style.display = 'block'; setTimeout(()=>e.style.display='none',3000); }
+function showSuccess(msg) { const e = document.getElementById('successMessage'); e.textContent = msg; e.style.display = 'block'; setTimeout(()=>e.style.display='none',3000); }
+
+function handleRegister(e) { e.preventDefault(); const n=document.getElementById('registerName').value, em=document.getElementById('registerEmail').value, p=document.getElementById('registerPassword').value, c=document.getElementById('registerConfirmPassword').value; if(p!==c)return showError('Passwords mismatch'); usersRef.orderByChild('email').equalTo(em).once('value', u=>{ if(u.exists())return showError('Email exists'); usersRef.push({name:n||em.split('@')[0], email:em, password:p, balance:0, registerDate:new Date().toLocaleString()}).then(()=>{ showSuccess('Registered!'); setTimeout(()=>switchTab('login'),1500); }); }); }
+function handleLogin(e) { e.preventDefault(); const em=document.getElementById('loginEmail').value, p=document.getElementById('loginPassword').value, r=document.getElementById('rememberMe').checked; usersRef.orderByChild('email').equalTo(em).once('value', u=>{ let f=null, k=null; u.forEach(c=>{ const v=c.val(); if(v.password===p){f=v;k=c.key;} }); if(!f)return showError('Invalid credentials'); currentUser=f; currentKey=k; if(r){localStorage.setItem('currentUser',JSON.stringify(f));localStorage.setItem('currentKey',k);} showMainWebsite(); startListeners(); refreshUI(); showPage('deals'); }); }
+function logout() { localStorage.removeItem('currentUser'); localStorage.removeItem('currentKey'); location.reload(); }
+
+function applyFilters() { 
+    let f = [...allDeals]; const s = document.getElementById('searchInput').value.toLowerCase();
+    if(s) f = f.filter(d=>[d.bin,d.name,d.bank,d.country].some(x=>x?.toString().toLowerCase().includes(s)));
+    const tbody = document.getElementById('dealsBody'); tbody.innerHTML = '';
+    f.forEach((d,i) => {
+        const balClass = d.cardBalance>1000?'high':(d.cardBalance>0?'medium':'low');
+        const row = tbody.insertRow();
+        row.innerHTML = `<td>${i+1}</td> <td><span class="badge ${getTypeBadge(d.type)}">${d.type||''}</span></td> <td>${d.bin||'-'}</td> <td>${d.name||''}</td> <td><span class="fi fi-${getFlag(d.country)}"></span> ${d.country||''}</td> <td>${d.bank||''}</td> <td>${d.zip||'-'}</td> <td class="price">$${d.price||0}</td> <td class="card-balance ${balClass}">$${d.cardBalance||0}</td> <td>${currentUser?.balance>=d.price ? `<button class="buy-btn" onclick="buyDeal('${d.bin}')">Acquire</button>` : '<span class="insufficient">Low Funds</span>'}</td>`;
+    });
+}
+
+function buyDeal(bin) { 
+    const deal = allDeals.find(d=>d.bin===bin); if(!deal)return; 
+    if(currentUser.balance<deal.price)return alert('Insufficient balance!'); 
+    if(confirm(`Acquire ${deal.name} for $${deal.price}?`)) { 
+        usersRef.child(currentKey).update({balance: currentUser.balance - deal.price}).then(()=>{
+            usersRef.child(currentKey).child('purchases').push({bin:deal.bin, item:deal.name, amount:deal.price, date:new Date().toLocaleString(), description:deal.description||'No details'});
+            alert('Acquisition successful!'); applyFilters();
+        });
+    } 
+}
+
+function loadHistory() { 
+    const h = document.getElementById('historyList'); 
+    if(currentUser.purchases) { 
+        h.innerHTML = Object.values(currentUser.purchases).map(p=>`<div class="history-card"><div><strong>${p.item}</strong><br><small>${p.date}</small></div><div><span class="price">$${p.amount}</span> <button class="view-details" onclick="showCard('${p.description}')">View Asset</button></div></div>`).join(''); 
+    } else h.innerHTML = '<p style="color:var(--text-secondary);">No assets acquired yet.</p>'; 
+}
+
+function showCard(desc) { document.getElementById('cardDetailsContent').textContent = desc; document.getElementById('cardModal').style.display = 'flex'; }
+function closeCardModal() { document.getElementById('cardModal').style.display = 'none'; }
+
+function calculateUSD() { const inr = parseFloat(document.getElementById('inrAmount').value)||0; const rate = siteSettings.exchangeRate||89; document.getElementById('usdAmount').textContent = `$${(inr/rate).toFixed(2)} USD`; }
+function selectPaymentMethod(m) { selectedMethod=m; document.getElementById('upiTab').classList.toggle('active',m==='upi'); document.getElementById('cryptoTab').classList.toggle('active',m==='crypto'); }
+function switchCrypto(t) { document.getElementById('usdtSection').style.display=t==='usdt'?'block':'none'; document.getElementById('btcSection').style.display=t==='btc'?'block':'none'; document.getElementById('usdtTab').classList.toggle('active',t==='usdt'); document.getElementById('btcTab').classList.toggle('active',t==='btc'); }
+function proceedToPayment() { document.getElementById(selectedMethod==='upi'?'upiPaymentDetails':'cryptoPaymentDetails').style.display='block'; document.getElementById('proceedBtn').style.display='none'; }
+function showPaymentForm() { document.getElementById('upiPaymentDetails').style.display='none'; document.getElementById('cryptoPaymentDetails').style.display='none'; document.getElementById('paymentDetailsForm').style.display='block'; }
+function cancelPaymentForm() { document.getElementById('paymentDetailsForm').style.display='none'; document.getElementById('proceedBtn').style.display='block'; }
+function copyAddress(id) { const text = document.getElementById(id+'AddressDisplay').textContent; navigator.clipboard.writeText(text).then(()=>alert('Copied!')); }
+function submitPaymentProof() { 
+    const t=document.getElementById('txnId').value; if(!t)return alert('Enter TXID');
+    pendingRef.push({user:currentUser.email, txnId:t, amount:parseFloat(document.getElementById('usdAmount').textContent.replace('$','')), method:selectedMethod, date:new Date().toLocaleString()}).then(()=>{
+        alert('Submitted for verification.'); cancelPaymentForm();
+    });
+}
+</script>
 </body>
 </html>
