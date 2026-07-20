@@ -7,19 +7,19 @@ export default function middleware(request) {
   // Vercel se user ki country nikalna
   const country = request.headers.get('x-vercel-ip-country');
 
-  // Agar user India (IN) se hai, toh usko block wala HTML page dikhao
+  // Agar user India (IN) se hai, toh usko simple API style page dikhao
   if (country === 'IN') {
     return new Response(
       `<!DOCTYPE html>
-      <html>
+      <html lang="en">
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Access Denied</title>
+        <title>403 Forbidden</title>
         <style>
           body { 
-            background: #000; 
-            color: #ff3333; 
-            font-family: 'Courier New', monospace; 
+            background-color: #ffffff; /* Pura white background */
+            color: #000000; /* Black text */
+            font-family: monospace; /* API jaisa raw text font */
             display: flex; 
             justify-content: center; 
             align-items: center; 
@@ -27,15 +27,10 @@ export default function middleware(request) {
             margin: 0;
             text-align: center;
           }
-          .alert { border: 2px solid #ff3333; padding: 30px; border-radius: 10px; }
         </style>
       </head>
       <body>
-        <div class="alert">
-          <h2>[ 403 FORBIDDEN ]</h2>
-          <p>EXE System is currently restricted in your region.</p>
-          <p>Please connect to a VPN to access this web interface.</p>
-        </div>
+        <div>{"error": true, "status": 403, "message": "Access Denied in your region"}</div>
       </body>
       </html>`,
       {
